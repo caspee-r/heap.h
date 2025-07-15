@@ -7,16 +7,16 @@
 #define REALLOC realloc
 #define ASSERT assert
 
-#define HEAP_MIN 0
-#define HEAP_MAX 1
+#define HEAP_MIN <
+#define HEAP_MAX >
 
-#define heap_t(type) struct {\
-	type* nodes;\
-	size_t size;\
-	size_t capacity;\
-	size_t arity;\
+#define heap_t(type)						\
+struct {									\
+	type* nodes;							\
+	size_t size;							\
+	size_t capacity;						\
+	unsigned char arity;					\
 }
-
 
 #define HEAP_GF 1.2f
 #define HEAP_INITIAL_CAP 100
@@ -24,7 +24,7 @@
 #define heap_get_root(heap) (heap)->nodes[0]
 #define heap_get_child_index(parent, childnum, arity) (arity)*(parent)+(childnum)
 #define heap_get_child(heaparr,parent,childnum, arity) (heaparr)[heap_get_child_index((parent),(childnum),(arity))]
-#define heap_get_parent_index(i,arity) (size_t)floor(((i)-1)/(arity))
+#define heap_get_parent_index(child_idx,arity) ((child_idx)-1)/(arity)
 #define heap_get_parent(heaparr,i,arity) (heaparr)[heap_get_parent_index((i),arity)]
 #define last(heap) (heap)->nodes[(heap)->size-1]
 #define heap_size(heap) (heap)->size
