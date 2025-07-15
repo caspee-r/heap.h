@@ -65,5 +65,5 @@ int main()
 	heap_pop(&heap,HEAP_MAX,root);
 	print_heap(heap);
 	printf("______________________________________\n");
-
+	heap_free(&heap);
 }

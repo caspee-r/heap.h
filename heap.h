@@ -26,6 +26,7 @@
 
 #define REALLOC realloc
 #define ASSERT assert
+#define FREE free
 
 #define HEAP_MIN <
 #define HEAP_MAX >
