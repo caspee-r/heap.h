@@ -38,24 +38,69 @@
 		}\
 	} while (0)\
 
+#define heapify_up(heap,heap_type,index)								\
+	do {																\
+		if (index <= 0 && index > (heap)->size-1) break;				\
+		for (unsigned i = index; i != 0 && (heap)->nodes[i] heap_type heap_get_parent((heap)->nodes,i,(heap)->arity);) \
+			{															\
+				(heap)->nodes[i] ^= (heap)->nodes[heap_get_parent_index(i,(heap)->arity)]; \
+				(heap)->nodes[heap_get_parent_index(i,(heap)->arity)] ^= (heap)->nodes[i]; \
+				(heap)->nodes[i] ^= (heap)->nodes[heap_get_parent_index(i,(heap)->arity)]; \
+				i = heap_get_parent_index(i,(heap)->arity);				\
+			}															\
+	} while (0)															\
 
-#define heap_push(heap, item)\
-	do {\
-		if ((heap)->size >= (heap)->capacity){\
-			(heap)->capacity = ((heap)->capacity == 0) ? HEAP_INITIAL_CAP : (heap)->capacity*HEAP_GF;\
-			(heap)->nodes = REALLOC((heap)->nodes,(heap)->capacity * sizeof(*(heap)->nodes));\
-			ASSERT((heap)->nodes && "NOT ENOUGH MEMORY\n");\
-		}\
-		(heap)->size++;\
-		last(heap) = (item);\
-		for (int i = (heap)->size-1 ; i != 0 && (heap)->nodes[i] > heap_get_parent((heap)->nodes,i,(heap)->arity);) {\
-			(heap)->nodes[i] = (heap)->nodes[i] ^ (heap)->nodes[heap_get_parent_index(i,(heap)->arity)];\
-			(heap)->nodes[heap_get_parent_index(i,(heap)->arity)] =\
-			(heap)->nodes[heap_get_parent_index(i,(heap)->arity)] ^ (heap)->nodes[i];\
-			(heap)->nodes[i] = (heap)->nodes[i] ^ (heap)->nodes[heap_get_parent_index(i,(heap)->arity)];\
-			i = heap_get_parent_index(i,(heap)->arity);\
-		}\
-	} while (0)\
+#define heapify_down(heap, heap_type, index)							\
+	do {																\
+		if (index < 0 && index > (heap)->size) break;					\
+		unsigned idx = index;											\
+		for (unsigned best = 1;;){										\
+			if (heap_get_child_index(idx, best, (heap)->arity) >= (heap)->size-1) break; \
+			for (unsigned child_idx = 2; child_idx <= (heap)->arity; ++child_idx ){ \
+				if ( heap_get_child((heap)->nodes,idx,(heap)->arity,child_idx) heap_type (heap)->nodes[best]){ \
+					best = child_idx;									\
+				}														\
+			}															\
+			(heap)->nodes[idx] ^= (heap)->nodes[heap_get_child_index(idx, best, (heap)->arity)]; \
+			(heap)->nodes[heap_get_child_index(idx, best, (heap)->arity)] ^= (heap)->nodes[idx]; \
+			(heap)->nodes[idx] ^= (heap)->nodes[heap_get_child_index(idx, best, (heap)->arity)]; \
+			idx = heap_get_child_index(idx, best, (heap)->arity);		\
+		}																\
+	} while(0)															\
+
+
+
+#define heap_push(heap, heap_type, item)									\
+	do {																\
+		if ((heap)->size >= (heap)->capacity){							\
+			(heap)->capacity = ((heap)->capacity == 0) ? HEAP_INITIAL_CAP : (heap)->capacity*HEAP_GF; \
+			(heap)->nodes = REALLOC((heap)->nodes,(heap)->capacity * sizeof(*(heap)->nodes)); \
+			ASSERT((heap)->nodes && "NOT ENOUGH MEMORY\n");				\
+		}																\
+		(heap)->size++;													\
+		last(heap) = (item);											\
+		heapify_up((heap),heap_type,((heap)->size - 1));				\
+	} while (0)															\
+
+
+#define heap_pop(heap, heap_type, poped_value)							\
+	do {																\
+		if (heap_is_empty((heap))){										\
+			break;														\
+		}																\
+		(poped_value) = heap_get_root((heap));							\
+		if ((heap)->size == 1){											\
+			(heap)->nodes[0] = 0;										\
+			break;														\
+		}																\
+		(heap)->nodes[0] = last((heap));								\
+		(heap)->size--;													\
+		heapify_down(heap, heap_type, 0);								\
+	} while (0)															\
+
+#endif
+
+#ifdef HEAP_IMPLEMENTATION
 
 
 
